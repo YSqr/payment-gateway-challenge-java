@@ -1,4 +1,4 @@
-package com.checkout.payment.gateway.configuration;
+package com.checkout.payment.gateway.infrastructure.configuration;
 
 import java.time.Duration;
 import org.springframework.boot.web.client.RestTemplateBuilder;

@@ -1,9 +1,9 @@
-package com.checkout.payment.gateway.model;
+package com.checkout.payment.gateway.interfaces.payment.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
-public class PostPaymentRequest implements Serializable {
+public class PaymentRequest implements Serializable {
 
   @JsonProperty("card_number_last_four")
   private int cardNumberLastFour;

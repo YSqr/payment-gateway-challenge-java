@@ -1,9 +1,9 @@
-package com.checkout.payment.gateway.service;
+package com.checkout.payment.gateway.application;
 
-import com.checkout.payment.gateway.exception.EventProcessingException;
-import com.checkout.payment.gateway.model.PostPaymentRequest;
-import com.checkout.payment.gateway.model.PostPaymentResponse;
-import com.checkout.payment.gateway.repository.PaymentsRepository;
+import com.checkout.payment.gateway.domain.model.PaymentsRepository;
+import com.checkout.payment.gateway.infrastructure.exception.EventProcessingException;
+import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentRequest;
+import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentResponse;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +20,12 @@ public class PaymentGatewayService {
     this.paymentsRepository = paymentsRepository;
   }
 
-  public PostPaymentResponse getPaymentById(UUID id) {
+  public PaymentResponse getPaymentById(UUID id) {
     LOG.debug("Requesting access to to payment with ID {}", id);
     return paymentsRepository.get(id).orElseThrow(() -> new EventProcessingException("Invalid ID"));
   }
 
-  public UUID processPayment(PostPaymentRequest paymentRequest) {
+  public UUID processPayment(PaymentRequest paymentRequest) {
     return UUID.randomUUID();
   }
 }

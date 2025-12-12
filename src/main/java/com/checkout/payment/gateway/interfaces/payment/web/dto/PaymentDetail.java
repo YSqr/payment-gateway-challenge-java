@@ -1,9 +1,9 @@
-package com.checkout.payment.gateway.model;
+package com.checkout.payment.gateway.interfaces.payment.web.dto;
 
-import com.checkout.payment.gateway.enums.PaymentStatus;
+import com.checkout.payment.gateway.domain.model.PaymentStatus;
 import java.util.UUID;
 
-public class GetPaymentResponse {
+public class PaymentDetail {
   private UUID id;
   private PaymentStatus status;
   private int cardNumberLastFour;

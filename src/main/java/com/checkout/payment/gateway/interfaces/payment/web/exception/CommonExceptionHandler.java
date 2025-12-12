@@ -1,6 +1,7 @@
-package com.checkout.payment.gateway.exception;
+package com.checkout.payment.gateway.interfaces.payment.web.exception;
 
-import com.checkout.payment.gateway.model.ErrorResponse;
+import com.checkout.payment.gateway.infrastructure.exception.EventProcessingException;
+import com.checkout.payment.gateway.interfaces.payment.web.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

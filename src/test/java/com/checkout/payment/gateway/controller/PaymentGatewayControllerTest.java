@@ -4,9 +4,9 @@ package com.checkout.payment.gateway.controller;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.checkout.payment.gateway.enums.PaymentStatus;
-import com.checkout.payment.gateway.model.PostPaymentResponse;
-import com.checkout.payment.gateway.repository.PaymentsRepository;
+import com.checkout.payment.gateway.domain.model.PaymentStatus;
+import com.checkout.payment.gateway.domain.model.PaymentsRepository;
+import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentResponse;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ class PaymentGatewayControllerTest {
 
   @Test
   void whenPaymentWithIdExistThenCorrectPaymentIsReturned() throws Exception {
-    PostPaymentResponse payment = new PostPaymentResponse();
+    PaymentResponse payment = new PaymentResponse();
     payment.setId(UUID.randomUUID());
     payment.setAmount(10);
     payment.setCurrency("USD");
@@ -36,9 +36,9 @@ class PaymentGatewayControllerTest {
     payment.setExpiryYear(2024);
     payment.setCardNumberLastFour(4321);
 
-    paymentsRepository.add(payment);
+    paymentsRepository.save(payment);
 
-    mvc.perform(MockMvcRequestBuilders.get("/payment/" + payment.getId()))
+    mvc.perform(MockMvcRequestBuilders.get("/api/v1/payments/" + payment.getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value(payment.getStatus().getName()))
         .andExpect(jsonPath("$.cardNumberLastFour").value(payment.getCardNumberLastFour()))
@@ -50,7 +50,7 @@ class PaymentGatewayControllerTest {
 
   @Test
   void whenPaymentWithIdDoesNotExistThen404IsReturned() throws Exception {
-    mvc.perform(MockMvcRequestBuilders.get("/payment/" + UUID.randomUUID()))
+    mvc.perform(MockMvcRequestBuilders.get("/api/v1/payments/" + UUID.randomUUID()))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.message").value("Page not found"));
   }
