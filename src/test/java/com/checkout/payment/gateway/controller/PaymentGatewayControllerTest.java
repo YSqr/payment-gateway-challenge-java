@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.checkout.payment.gateway.domain.model.PaymentStatus;
 import com.checkout.payment.gateway.domain.model.PaymentsRepository;
+import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentCardInfo;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentResponse;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -29,21 +30,24 @@ class PaymentGatewayControllerTest {
   void whenPaymentWithIdExistThenCorrectPaymentIsReturned() throws Exception {
     PaymentResponse payment = new PaymentResponse();
     payment.setId(UUID.randomUUID());
-    payment.setAmount(10);
+    payment.setAmount(10L);
     payment.setCurrency("USD");
     payment.setStatus(PaymentStatus.AUTHORIZED);
-    payment.setExpiryMonth(12);
-    payment.setExpiryYear(2024);
-    payment.setCardNumberLastFour(4321);
+
+    PaymentCardInfo card = new PaymentCardInfo();
+    card.setExpiryMonth(12);
+    card.setExpiryYear(2024);
+    card.setLastFour("4321");
+    payment.setCard(card);
 
     paymentsRepository.save(payment);
 
     mvc.perform(MockMvcRequestBuilders.get("/api/v1/payments/" + payment.getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value(payment.getStatus().getName()))
-        .andExpect(jsonPath("$.cardNumberLastFour").value(payment.getCardNumberLastFour()))
-        .andExpect(jsonPath("$.expiryMonth").value(payment.getExpiryMonth()))
-        .andExpect(jsonPath("$.expiryYear").value(payment.getExpiryYear()))
+        .andExpect(jsonPath("$.card.last_four").value(payment.getCard().getLastFour()))
+        .andExpect(jsonPath("$.card.expiry_month").value(payment.getCard().getExpiryMonth()))
+        .andExpect(jsonPath("$.card.expiry_year").value(payment.getCard().getExpiryYear()))
         .andExpect(jsonPath("$.currency").value(payment.getCurrency()))
         .andExpect(jsonPath("$.amount").value(payment.getAmount()));
   }
