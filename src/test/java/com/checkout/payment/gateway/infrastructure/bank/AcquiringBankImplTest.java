@@ -3,6 +3,7 @@ package com.checkout.payment.gateway.infrastructure.bank;
 import com.checkout.payment.gateway.domain.model.BankResult;
 import com.checkout.payment.gateway.domain.model.PaymentStatus;
 import com.checkout.payment.gateway.infrastructure.configuration.ApplicationConfiguration;
+import com.checkout.payment.gateway.infrastructure.exception.EventProcessingException;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +18,7 @@ import org.springframework.web.client.ResourceAccessException;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -120,7 +122,7 @@ class AcquiringBankImplTest {
   }
 
   @Test
-  @DisplayName("Should return REJECTED when network connection fails (Timeout/Unreachable)")
+  @DisplayName("Should throw EventProcessingException when network connection fails (Timeout/Unreachable)")
   void process_ShouldReturnDeclined_WhenNetworkFails() {
     // Given
     PaymentRequest request = new PaymentRequest();
@@ -136,8 +138,8 @@ class AcquiringBankImplTest {
           throw new ResourceAccessException("Connection timed out");
         });
 
-    BankResult result = bank.process(request, traceId);
-
-    assertThat(result.getStatus()).isEqualTo(PaymentStatus.REJECTED);
+    assertThrows(EventProcessingException.class, () -> {
+      bank.process(request, traceId);
+    });
   }
 }

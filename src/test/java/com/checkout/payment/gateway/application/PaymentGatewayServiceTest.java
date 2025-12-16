@@ -6,6 +6,7 @@ import com.checkout.payment.gateway.domain.model.PaymentStatus;
 import com.checkout.payment.gateway.domain.model.PaymentsRepository;
 import com.checkout.payment.gateway.domain.service.AcquiringBank;
 import com.checkout.payment.gateway.infrastructure.exception.EventProcessingException;
+import com.checkout.payment.gateway.infrastructure.exception.PaymentNotFoundException;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentRequest;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentResponse;
 import org.junit.jupiter.api.Test;
@@ -100,7 +101,7 @@ class PaymentGatewayServiceTest {
     when(paymentsRepository.get(id)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> paymentGatewayService.getPaymentById(id))
-        .isInstanceOf(EventProcessingException.class)
-        .hasMessageContaining("Invalid ID");
+        .isInstanceOf(PaymentNotFoundException.class)
+        .hasMessageContaining("not found");
   }
 }

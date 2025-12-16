@@ -5,6 +5,7 @@ import com.checkout.payment.gateway.domain.model.Payment;
 import com.checkout.payment.gateway.domain.model.PaymentsRepository;
 import com.checkout.payment.gateway.domain.service.AcquiringBank;
 import com.checkout.payment.gateway.infrastructure.exception.EventProcessingException;
+import com.checkout.payment.gateway.infrastructure.exception.PaymentNotFoundException;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentCardInfo;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentRequest;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentResponse;
@@ -31,7 +32,7 @@ public class PaymentGatewayService {
     LOG.debug("Requesting access to to payment with ID {}", id);
 
     Payment payment = paymentsRepository.get(id)
-        .orElseThrow(() -> new EventProcessingException("Invalid ID"));
+        .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
 
     PaymentCardInfo card = PaymentCardInfo.builder()
         .lastFour(payment.getCardLastFour())

@@ -1,6 +1,7 @@
 package com.checkout.payment.gateway.e2e;
 
 import com.checkout.payment.gateway.domain.model.PaymentStatus;
+import com.checkout.payment.gateway.interfaces.payment.web.dto.ErrorResponse;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentRequest;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentResponse;
 import org.junit.jupiter.api.Tag;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -103,22 +103,20 @@ public class TestWithSimulator {
 
   // Bank return 503 Service Unavailable
   @Test
-  void shouldReturnRejectWhenBankUnavailable() {
+  void shouldReturnBadGatewayWhenBankUnavailable() {
     PaymentRequest request = createValidRequest();
     request.setCardNumber("1234567812345670"); // Ends with 0
 
-    ResponseEntity<PaymentResponse> response = postPayment(request);
+    ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
+        "http://localhost:" + port + "/api/v1/payments",
+        request,
+        ErrorResponse.class
+    );
 
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    assertThat(response.getBody().getStatus()).isEqualTo(PaymentStatus.REJECTED);
-
-    UUID paymentId = response.getBody().getId();
-    ResponseEntity<PaymentResponse> getResponse = getPayment(paymentId);
-
-    assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(getResponse.getBody().getId()).isEqualTo(paymentId);
-    assertThat(getResponse.getBody().getStatus()).isEqualTo(PaymentStatus.REJECTED);
-    assertThat(getResponse.getBody().getCard().getMaskedNumber()).isEqualTo("************5670");
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
+    ErrorResponse errorBody = response.getBody();
+    assertThat(errorBody).isNotNull();
+    assertThat(errorBody.getMessage()).contains("Bank server error");
 
   }
 
@@ -127,13 +125,15 @@ public class TestWithSimulator {
   void shouldReturn400_WhenRequestIsInvalid() {
     PaymentRequest request = new PaymentRequest();
 
-    ResponseEntity<Map> response = restTemplate.postForEntity(
+    ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
         "http://localhost:" + port + "/api/v1/payments",
         request,
-        Map.class
+        ErrorResponse.class
     );
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(response.getBody().get("status")).isEqualTo(400);
+    ErrorResponse errorBody = response.getBody();
+    assertThat(errorBody).isNotNull();
+    assertThat(errorBody.getMessage()).contains("Validation Failed").contains("Rejected");
   }
 }

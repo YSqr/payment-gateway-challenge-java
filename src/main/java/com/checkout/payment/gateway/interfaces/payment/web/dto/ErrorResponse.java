@@ -1,20 +1,13 @@
 package com.checkout.payment.gateway.interfaces.payment.web.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.util.UUID;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ErrorResponse {
-  private final String message;
-
-  public ErrorResponse(String message) {
-    this.message = message;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  @Override
-  public String toString() {
-    return "ErrorResponse{" +
-        "message='" + message + '\'' +
-        '}';
-  }
+  private String message;
 }
