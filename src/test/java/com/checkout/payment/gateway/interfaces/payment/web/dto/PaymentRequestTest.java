@@ -49,6 +49,7 @@ class PaymentRequestTest {
         // --- Currency Tests ---
         Arguments.of("Currency is invalid code", (Consumer<PaymentRequest>) r -> r.setCurrency("US"), "currency"),
         Arguments.of("Currency is lower case", (Consumer<PaymentRequest>) r -> r.setCurrency("LOL"), "currency"),
+        Arguments.of("Currency is beyond 3 allowed", (Consumer<PaymentRequest>) r -> r.setCurrency("JPY"), "currency"),
 
         // --- Expiry Date Logic  ---
         Arguments.of("Expiry date is in the past", (Consumer<PaymentRequest>) r -> {

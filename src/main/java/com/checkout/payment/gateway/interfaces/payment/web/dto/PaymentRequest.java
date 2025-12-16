@@ -34,7 +34,8 @@ public class PaymentRequest {
   private Integer expiryYear;
 
   @NotBlank(message = "Currency is required")
-  @Pattern(regexp = "^[A-Z]{3}", message = "Currency must be ISO currency code (3 characters upper case letters)")
+  @Pattern(regexp = "USD|EUR|GBP")
+  //@Pattern(regexp = "^[A-Z]{3}", message = "Currency must be ISO currency code (3 characters upper case letters)")
   @ISO4217Currency(message = "Currency must be a valid ISO 4217 code")
   private String currency;
 
