@@ -30,14 +30,14 @@ public class CommonExceptionHandler {
     // if upstream timeout
     if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("timeout")) {
       return new ResponseEntity<>(
-          new ErrorResponse("Upstream provider timed out. Please check status later." + ex.getMessage()),
+          new ErrorResponse("Upstream provider timed out. Please check status later." + ex.getMessage(), ex.getPaymentId()),
           HttpStatus.GATEWAY_TIMEOUT
       );
     }
 
     // other upstream error
     return new ResponseEntity<>(
-        new ErrorResponse("Error processing payment with upstream provider. Please check later." + ex.getMessage()),
+        new ErrorResponse("Error processing payment with upstream provider. Please check later." + ex.getMessage(), ex.getPaymentId()),
         HttpStatus.BAD_GATEWAY
     );
   }

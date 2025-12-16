@@ -76,15 +76,15 @@ public class AcquiringBankImpl implements AcquiringBank {
     } catch (HttpServerErrorException e) {
       // IMPORTANT: undetermined status !! we don't know the payment success or not
       log.error("Bank server error for payment {}, received {}", paymentId, e.getStatusCode(), e);
-      throw new EventProcessingException("Bank server error: " + e.getStatusCode());
+      throw new EventProcessingException("Bank server error: " + e.getStatusCode(), paymentId);
     } catch (ResourceAccessException e) {
       // timeout, undetermined status !!
       log.error("Bank request timeout for payment {}", paymentId, e);
-      throw new EventProcessingException("Bank network issue");
+      throw new EventProcessingException("Bank network issue", paymentId);
     } catch (Exception e) {
       // unknow error
       log.error("Unknown error calling bank for payment {}", paymentId, e);
-      throw new EventProcessingException("Unknow bank error");
+      throw new EventProcessingException("Unknow bank error", paymentId);
     }
   }
 }

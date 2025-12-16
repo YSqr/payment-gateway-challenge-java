@@ -117,7 +117,7 @@ public class TestWithSimulator {
     ErrorResponse errorBody = response.getBody();
     assertThat(errorBody).isNotNull();
     assertThat(errorBody.getMessage()).contains("Bank server error");
-
+    assertThat(errorBody.getPaymentId()).isNotNull();
   }
 
   // Bad Request
