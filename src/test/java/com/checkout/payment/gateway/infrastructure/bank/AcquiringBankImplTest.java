@@ -2,8 +2,7 @@ package com.checkout.payment.gateway.infrastructure.bank;
 
 import com.checkout.payment.gateway.domain.model.BankResult;
 import com.checkout.payment.gateway.domain.model.PaymentStatus;
-import com.checkout.payment.gateway.infrastructure.configuration.ApplicationConfiguration;
-import com.checkout.payment.gateway.infrastructure.exception.EventProcessingException;
+import com.checkout.payment.gateway.infrastructure.exception.UpstreamTimeoutException;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -138,7 +137,7 @@ class AcquiringBankImplTest {
           throw new ResourceAccessException("Connection timed out");
         });
 
-    assertThrows(EventProcessingException.class, () -> {
+    assertThrows(UpstreamTimeoutException.class, () -> {
       bank.process(request, traceId);
     });
   }

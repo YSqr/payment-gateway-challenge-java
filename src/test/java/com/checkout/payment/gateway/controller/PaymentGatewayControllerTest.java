@@ -10,14 +10,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.checkout.payment.gateway.application.PaymentGatewayService;
-import com.checkout.payment.gateway.domain.model.Payment;
 import com.checkout.payment.gateway.domain.model.PaymentStatus;
-import com.checkout.payment.gateway.domain.model.PaymentsRepository;
+import com.checkout.payment.gateway.infrastructure.exception.PaymentNotFoundException;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentCardInfo;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentRequest;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +33,7 @@ class PaymentGatewayControllerTest {
 
   @Autowired
   private MockMvc mvc;
-  @Autowired
-  PaymentsRepository paymentsRepository;
+
   @Autowired
   private ObjectMapper objectMapper;
 
@@ -48,36 +45,41 @@ class PaymentGatewayControllerTest {
   void whenPaymentWithIdExistThenCorrectPaymentIsReturned() throws Exception {
     UUID paymentId = UUID.randomUUID();
 
-    Payment payment = Payment.builder()
+    PaymentResponse payment = PaymentResponse.builder()
         .id(paymentId)
         .amount(100L)
         .currency("USD")
         .status(PaymentStatus.AUTHORIZED)
-        .cardLastFour("4321")
-        .cardExpiryMonth(12)
-        .cardExpiryYear(2024)
-        .maskedCardNumber("************4321") // GET 必须要有这个
-        .createdAt(Instant.now())
+        .card( PaymentCardInfo.builder()
+            .lastFour("4321")
+            .expiryMonth(12)
+            .expiryYear(2024)
+            .maskedNumber("************4321")
+            .build())
         .build();
 
-    paymentsRepository.save(payment);
+    when(paymentGatewayService.getPaymentById(paymentId)).thenReturn(payment);
 
     mvc.perform(MockMvcRequestBuilders.get("/api/v1/payments/" + payment.getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value(payment.getStatus().getName()))
-        .andExpect(jsonPath("$.card.last_four").value(payment.getCardLastFour()))
-        .andExpect(jsonPath("$.card.expiry_month").value(payment.getCardExpiryMonth()))
-        .andExpect(jsonPath("$.card.expiry_year").value(payment.getCardExpiryYear()))
+        .andExpect(jsonPath("$.card.last_four").value(payment.getCard().getLastFour()))
+        .andExpect(jsonPath("$.card.expiry_month").value(payment.getCard().getExpiryMonth()))
+        .andExpect(jsonPath("$.card.expiry_year").value(payment.getCard().getExpiryYear()))
         .andExpect(jsonPath("$.currency").value(payment.getCurrency()))
         .andExpect(jsonPath("$.amount").value(payment.getAmount()));
   }
 
   @Test
   void whenPaymentWithIdDoesNotExistThen404IsReturned() throws Exception {
+    when(paymentGatewayService.getPaymentById(any(UUID.class)))
+        .thenThrow(new PaymentNotFoundException("Payment not found"));
+
     mvc.perform(MockMvcRequestBuilders.get("/api/v1/payments/" + UUID.randomUUID()))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.message").value("Payment not found"));
   }
+
 
   @Test
   void createPayment_ShouldPassIdempotencyKey_WhenHeaderPresent() throws Exception {

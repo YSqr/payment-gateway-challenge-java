@@ -2,6 +2,7 @@ package com.checkout.payment.gateway.interfaces.payment.web.exception;
 
 import com.checkout.payment.gateway.infrastructure.exception.EventProcessingException;
 import com.checkout.payment.gateway.infrastructure.exception.PaymentNotFoundException;
+import com.checkout.payment.gateway.infrastructure.exception.UpstreamTimeoutException;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,19 +27,18 @@ public class CommonExceptionHandler {
   @ExceptionHandler(EventProcessingException.class)
   public ResponseEntity<ErrorResponse> handleException(EventProcessingException ex) {
     LOG.error("Processing Error", ex);
-
-    // if upstream timeout
-    if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("timeout")) {
-      return new ResponseEntity<>(
-          new ErrorResponse("Upstream provider timed out. Please check status later." + ex.getMessage(), ex.getPaymentId()),
-          HttpStatus.GATEWAY_TIMEOUT
-      );
-    }
-
     // other upstream error
     return new ResponseEntity<>(
         new ErrorResponse("Error processing payment with upstream provider. Please check later." + ex.getMessage(), ex.getPaymentId()),
         HttpStatus.BAD_GATEWAY
+    );
+  }
+
+  @ExceptionHandler(UpstreamTimeoutException.class)
+  public ResponseEntity<ErrorResponse> handleUpstreamTimeout(UpstreamTimeoutException ex) {
+    return new ResponseEntity<>(
+        new ErrorResponse("Upstream provider timed out. Please check status later.", ex.getPaymentId()),
+        HttpStatus.GATEWAY_TIMEOUT
     );
   }
 

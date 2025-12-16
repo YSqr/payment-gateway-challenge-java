@@ -4,6 +4,7 @@ import com.checkout.payment.gateway.domain.model.BankResult;
 import com.checkout.payment.gateway.domain.model.PaymentStatus;
 import com.checkout.payment.gateway.domain.service.AcquiringBank;
 import com.checkout.payment.gateway.infrastructure.exception.EventProcessingException;
+import com.checkout.payment.gateway.infrastructure.exception.UpstreamTimeoutException;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.BankPaymentRequest;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.BankPaymentResponse;
 import com.checkout.payment.gateway.interfaces.payment.web.dto.PaymentRequest;
@@ -80,7 +81,7 @@ public class AcquiringBankImpl implements AcquiringBank {
     } catch (ResourceAccessException e) {
       // timeout, undetermined status !!
       log.error("Bank request timeout for payment {}", paymentId, e);
-      throw new EventProcessingException("Bank network issue", paymentId);
+      throw new UpstreamTimeoutException("Bank network issue", paymentId, e);
     } catch (Exception e) {
       // unknow error
       log.error("Unknown error calling bank for payment {}", paymentId, e);
