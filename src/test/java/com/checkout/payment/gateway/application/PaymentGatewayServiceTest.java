@@ -77,7 +77,7 @@ class PaymentGatewayServiceTest {
   @Test
   void getPaymentDetails_ShouldReturnMaskedNumber_WhenFound() {
     UUID id = UUID.randomUUID();
-    Payment payment = Payment.builder() // 假设 Entity 还有 Builder
+    Payment payment = Payment.builder()
         .id(id)
         .status(PaymentStatus.AUTHORIZED)
         .amount(200L)
