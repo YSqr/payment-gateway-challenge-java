@@ -72,7 +72,7 @@ The API supports idempotency for safely retrying requests without accidentally p
 
 ### Security & Compliance (PCI-DSS)
 * **No CVV Storage**: The CVV is passed transiently to the Acquiring Bank and immediately discarded from memory. It is never persisted.
-* **Data Masking**: Primary Account Numbers (PAN) are masked upon entry into the domain model. All internal logs and API read operations expose only the last 4 digits (and bin/expiry).
+* **Data Masking**: Primary Account Numbers (PAN) are masked upon entry into the domain model. All internal logs and API read operations expose only the last 4 digits.
 
 ### Testing & Execution
 #### Prerequisites
@@ -111,7 +111,7 @@ The following table maps real-world scenarios to System/Database states and HTTP
 | **Processing Started** | N/A (Internal) | `PENDING`               | **Audit Trail**: Before calling the bank, the request is persisted as `PENDING`. This ensures a record exists for reconciliation even if the application crashes immediately after. |
 | **Bank Approved** | `201 Created` | `AUTHORIZED`            | **Final State**: The bank confirmed the transaction. Masked card details and Authorization Code are returned. |
 | **Bank Declined**<br>(e.g., Insufficient Funds) | `201 Created` | `DECLINED`              | **Final State**: A valid business outcome. The transaction was processed successfully but rejected by the issuer. |
-| **Upstream Malformed Response**<br>(Bank returns 201 but invalid/empty body) | `201 Created` | `REJECTED` | **Fail Safe**: Although the bank returned a success code, the response body was unreadable or missing critical fields. To mitigate risk, the system conservatively treats this protocol violation as a rejection (Status: `REJECTED`) rather than leaving it indeterminate. |
-| **Upstream Timeout**<br>(Network Partition/Bank Slow) | `504 Gateway Timeout` | `PENDING`               | **Safety Lock**: The system did not receive a definitive answer. The state remains `PENDING` to prevent double-charging. The client is instructed to retry safely using the Idempotency Key. |
-| **Upstream Unavailable**<br>(Bank returns 5xx/429) | `502 Bad Gateway` | `PENDING`               | **Transient Failure**: Similar to timeout, the final status is unknown. The state remains `PENDING` for future reconciliation or retry. |
+| **Upstream Malformed Response**<br>(Bank returns 201 but invalid/empty body) | `201 Created` | `REJECTED`              | **Fail Safe**: Although the bank returned a success code, the response body was unreadable or missing critical fields. To mitigate risk, the system conservatively treats this protocol violation as a rejection (Status: `REJECTED`) rather than leaving it indeterminate. |
+| **Upstream Timeout**<br>(Network Partition/Bank Slow) | `504 Gateway Timeout` | `UNKNOWN`               | **Safety Lock**: The system did not receive a definitive answer. The state remains `PENDING` to prevent double-charging. The client is instructed to retry safely using the Idempotency Key. |
+| **Upstream Unavailable**<br>(Bank returns 5xx/429) | `502 Bad Gateway` | `UNKNOWN`               | **Transient Failure**: Similar to timeout, the final status is unknown. The state remains `PENDING` for future reconciliation or retry. |
 
