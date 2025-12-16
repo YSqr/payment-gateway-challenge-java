@@ -3,9 +3,11 @@ package com.checkout.payment.gateway.domain.model;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum PaymentStatus {
+  PENDING("Pending"),
   AUTHORIZED("Authorized"),
   DECLINED("Declined"),
-  REJECTED("Rejected");
+  REJECTED("Rejected"),
+  UNKNOWN("Unknown");
 
   private final String name;
 

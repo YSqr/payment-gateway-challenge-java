@@ -27,6 +27,8 @@ public class Payment {
 
   private String authorizationCode;
 
+  private String idempotencyKey;
+
   private Instant createdAt;
 
   @Override

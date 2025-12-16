@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InMemoryPaymentsRepository implements PaymentsRepository {
 
   private final Map<UUID, Payment> storage = new ConcurrentHashMap<>();
+  private final Map<String, Payment> idempotencyIndex = new ConcurrentHashMap<>();
 
   @Override
   public Payment save(Payment payment) {
@@ -19,11 +20,20 @@ public class InMemoryPaymentsRepository implements PaymentsRepository {
       payment.setId(UUID.randomUUID());
     }
     storage.put(payment.getId(), payment);
+
+    if(payment.getIdempotencyKey() != null) {
+      idempotencyIndex.put(payment.getIdempotencyKey(), payment);
+    }
     return payment;
   }
 
   @Override
   public Optional<Payment> get(UUID id) {
     return Optional.ofNullable(storage.get(id));
+  }
+
+  @Override
+  public Optional<Payment> getByIdempotencyKey(String key) {
+    return Optional.ofNullable(idempotencyIndex.get(key));
   }
 }
