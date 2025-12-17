@@ -30,6 +30,7 @@ public class Payment {
   private String idempotencyKey;
 
   private Instant createdAt;
+  private Instant updatedAt;
 
   @Override
   public boolean equals(Object o) {

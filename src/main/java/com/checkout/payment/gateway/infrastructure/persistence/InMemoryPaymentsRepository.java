@@ -3,6 +3,7 @@ package com.checkout.payment.gateway.infrastructure.persistence;
 import com.checkout.payment.gateway.domain.model.Payment;
 import com.checkout.payment.gateway.domain.model.PaymentsRepository;
 import org.springframework.stereotype.Repository;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,10 +26,12 @@ public class InMemoryPaymentsRepository implements PaymentsRepository {
       if(payment.getIdempotencyKey() != null && idempotencyIndex.containsKey(payment.getIdempotencyKey())) {
         return idempotencyIndex.get(payment.getIdempotencyKey());
       }
-      
+
       if (payment.getId() == null) {
-        payment.setId(UUID.randomUUID());
+        throw new IllegalArgumentException("Payment ID cannot be null when saving");
       }
+
+      payment.setUpdatedAt(Instant.now());
       storage.put(payment.getId(), payment);
 
       if (payment.getIdempotencyKey() != null) {
