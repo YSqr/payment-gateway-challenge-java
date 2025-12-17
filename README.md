@@ -101,6 +101,9 @@ The API supports idempotency for safely retrying requests without accidentally p
 * **Circuit Breaking**: Implement Resilience4j to handle "Service Unavailable" scenarios (e.g., cards ending in 0) to prevent resource exhaustion.
 * **Observability**: Integrate Micrometer and OpenTelemetry for metrics and distributed tracing.
 * **Data Lifecycle**: Implement **TTL (Time-To-Live)** policies for Idempotency Keys (e.g., 24-48 hours). Currently, the in-memory map grows indefinitely; in production, keys should be automatically evicted via Redis expiration to prevent storage bloat.
+* **Authentication**: Use **OAuth2 with Client Credentials grant type** (standard for Server-to-Server communication). Merchants would be required to provide a valid JWT token in the `Authorization` header.
+* **Authorization**: Implement **Role-Based Access Control (RBAC)**. For example, a merchant should only be able to retrieve (`GET`) payments that belong to their own `merchant_id`.
+ 
 ---
 
 ### Appendix A: System Behavior Matrix
