@@ -76,11 +76,13 @@ The API supports idempotency for safely retrying requests without accidentally p
 
 ### Testing & Execution
 #### Prerequisites
-* **Bank Simulator**: The integration relies on the external Bank Simulator.
-* **Execution**: Please ensure the simulator is running before executing the full test suite or the application:
+* **Docker & Compose**: Required to orchestrate the environment.
+* **Service Orchestration**: The entire stack, including the **Gateway** and the **Bank Simulator**, is now fully containerized. You can launch both services with a single command:
     ```bash
-    docker-compose up -d
+    docker-compose up --build
     ```
+  *Note: The Gateway will be accessible at `http://localhost:8091`, while the Simulator remains at `http://localhost:8080`.* 
+
 #### Testing Strategy
 * **Controller Tests**: Use `@MockBean` to strictly verify the HTTP contract, JSON serialization, and Exception-to-Status mapping without relying on the repository.
 * **Domain Tests**: Verify business rules and validation logic in isolation.

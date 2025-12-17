@@ -12,4 +12,12 @@ services:
       - type: bind
         source: ./imposters
         target: /imposters
-      
+
+  gateway:
+    build: .
+    ports:
+      - "8091:8090"
+    depends_on:
+      - bank_simulator
+    environment:
+      - ACQUIRING_BANK_URL=http://bank_simulator:8080
