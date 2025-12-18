@@ -1,5 +1,6 @@
 package com.checkout.payment.gateway.application;
 
+import com.checkout.payment.gateway.common.Util;
 import com.checkout.payment.gateway.domain.model.BankResult;
 import com.checkout.payment.gateway.domain.model.Payment;
 import com.checkout.payment.gateway.domain.model.PaymentStatus;
@@ -69,7 +70,7 @@ public class PaymentGatewayService {
 
     String cardNumber = paymentRequest.getCardNumber();
     String lastFour = cardNumber.substring(cardNumber.length() - 4);
-    String maskedNumber = maskCardNumber(cardNumber);
+    String maskedNumber = Util.maskCardNumber(cardNumber);
 
     Payment payment = Payment.builder()
         .id(paymentId)
@@ -124,12 +125,5 @@ public class PaymentGatewayService {
         .build();
   }
 
-  private String maskCardNumber(String fullNumber) {
-    if (fullNumber == null || fullNumber.length() < 4) {
-      return "****"; // Fallback safety
-    }
-    int length = fullNumber.length();
-    // E.g. "1234567812345678" -> "************5678"
-    return "*".repeat(length - 4) + fullNumber.substring(length - 4);
-  }
+
 }

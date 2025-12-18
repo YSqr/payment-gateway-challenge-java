@@ -1,5 +1,6 @@
 package com.checkout.payment.gateway.interfaces.payment.web.dto;
 
+import com.checkout.payment.gateway.common.Util;
 import com.checkout.payment.gateway.common.validation.ISO4217Currency;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -35,7 +36,6 @@ public class PaymentRequest {
 
   @NotBlank(message = "Currency is required")
   @Pattern(regexp = "USD|EUR|GBP")
-  //@Pattern(regexp = "^[A-Z]{3}", message = "Currency must be ISO currency code (3 characters upper case letters)")
   @ISO4217Currency(message = "Currency must be a valid ISO 4217 code")
   private String currency;
 
@@ -61,7 +61,7 @@ public class PaymentRequest {
   @Override
   public String toString() {
     return "PaymentRequest{" +
-        "cardNumber=*******" +  cardNumber.substring(cardNumber.length() - 4) +
+        "cardNumber=" + Util.maskCardNumber(cardNumber) +
         ", expiryMonth=" + expiryMonth +
         ", expiryYear=" + expiryYear +
         ", currency='" + currency + '\'' +
